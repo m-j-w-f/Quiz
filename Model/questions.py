@@ -37,5 +37,5 @@ def getQ(diff: str, cat: int, token: str) -> dict:
     response = openURL(url)
     return response["results"][0]
 
-
+# Test
 getQ("hard", 9, "fd9d2541116a22530350997198b2a964be6ed944a0ca31b0c71bf7516dd95bfa")
