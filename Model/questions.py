@@ -1,41 +1,58 @@
-import urllib.parse, urllib.request, urllib.error
-import json
-import translate
+from Model.helpers import openURL
+from random import randint
+import urllib.parse
+from Model.translate import translateT
 
 
-def openURL(url: str) -> dict:
-    uh = urllib.request.urlopen(url)
-    data = uh.read().decode()
-    response = json.loads(data)
-    if response["response_code"] == 0:
-        return response
-    # TODO add other response codes
-    raise Exception("Something went Wrong")
+class Question:
 
+    @staticmethod
+    def getSessionToken() -> str:
+        """
+        Returns a session Token which is valid for 6h
+        :return: Token
+        """
+        url = "https://opentdb.com/api_token.php?command=request"
+        response = openURL(url)
+        return response["token"]
 
-def getSessionToken() -> str:
-    """
-    Returns a session Token which is valid for 6h
-    :return: Token
-    """
-    url = "https://opentdb.com/api_token.php?command=request"
-    response = openURL(url)
-    return response["token"]
+    def __init__(self, diff: str, cat: int, token: str):
+        """
+        Function to get Questions from the db and initialize Question
+        :param diff: difficulty can be "easy", "medium", "hard"
+        :param cat: category, all categories can be found here: https://opentdb.com/api_category.php
+        :param token: session Token from getSessionToken
+        """
 
+        url = "https://opentdb.com/api.php?"
+        url = url + urllib.parse.urlencode({"amount": 1, "difficulty": diff, "category": cat, "type": "multiple",
+                                           "encoding": "base64", "token": token})
+        response = None
+        while response is None:
+            try:
+                response = openURL(url)
+            except Exception:
+                pass
+        self.full = response["results"][0]
+        self.question = self.full["question"]
+        self.correct_answer = self.full["correct_answer"]
+        self.answers = self.full["incorrect_answers"]
+        # Create shuffled answers
+        idx = randint(0, len(self.answers))
+        self.answers.insert(idx, self.correct_answer)
+        self.correct_index = idx
 
-def getQ(diff: str, cat: int, token: str) -> dict:
-    """
-    Function to get Questions from the db
-    :param diff: difficulty can be "easy", "medium", "hard"
-    :param cat: category, all categories can be found here: https://opentdb.com/api_category.php
-    :param token: session Token from getSessionToken
-    :return: Dict with category, type, difficulty, question, correct_answer and incorrect_answers
-    """
-    url = "https://opentdb.com/api.php?"
-    url = url + urllib.parse.urlencode({"amount": 1, "difficulty": diff, "category": cat, "type": "multiple",
-                                        "token": token})
-    response = openURL(url)
-    return response["results"][0]
+    def __str__(self):
+        s = self.question + "\n"
+        c = ord("A")
+        for a in self.answers:
+            s += "(" + chr(c) + ") " + a + "   "
+            c += 1
+        return s
 
-# Test
-getQ("hard", 9, "fd9d2541116a22530350997198b2a964be6ed944a0ca31b0c71bf7516dd95bfa")
+    def translateQ(self):
+        temp = [self.question] + self.answers
+        temp = translateT(temp)
+        self.question = temp[0]["text"]
+        temp = temp[1:]
+        self.answers = [x["text"] for x in temp]
