@@ -1,4 +1,4 @@
-from Model.keys import key
+from Model.credentials import key
 import requests
 
 
