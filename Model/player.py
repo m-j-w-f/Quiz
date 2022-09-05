@@ -6,6 +6,8 @@ class Game:
     players = list()
     currentRound = 0
     i = 0
+    savedI = 0
+    flag = True
     j = 0
 
     def __init__(self, nRnds: int):
@@ -25,12 +27,26 @@ class Game:
         self.i = 0
         shuffle(self.players)
 
+    def storeI(self):
+        if self.flag:
+            # nothing is yet stored
+            self.flag = False
+            self.savedI = self.i
+            print(f"stored {self.savedI}")
+
+    def restoreI(self):
+        if not self.flag:
+            # something was stored
+            self.flag = True
+            self.i = self.savedI
+            print(f"restored {self.i}")
+
     def nextQinRoundCounter(self):
         self.j += 1
         print(self.j)
 
     def checkNextRound(self):
-        if self.j > len(self.players):
+        if self.j >= len(self.players):
             self.j = 0
             print("New Round Started!")
             return True
@@ -97,6 +113,8 @@ class Player:
         if a == q.correct_index:
             print("Correct!")
             self.score += 1
+            # restores the correct order of players
+            self.game.restoreI()
             self.game.nextPlayer()
             return True
         print("Incorrect!")

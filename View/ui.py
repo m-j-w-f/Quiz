@@ -95,8 +95,9 @@ class QuestionWindow(Screen):
         # Add one to in-Round Counter
         Gme.nextQinRoundCounter()
         # check if new round starts
-        if Gme.checkNextRound:
+        if Gme.checkNextRound():
             Gme.nextRound()
+            # TODO create new category window with correct name or change name
             sm.current = "categoryW"
         else:
             sm.add_widget(QuestionWindow())
@@ -109,8 +110,10 @@ class QuestionWindow(Screen):
             # this adds a new Question Window with a new Question
             self.getNewQuestionWindow()
         else:
-            # Next Player to answer and Update Text in Question Window
+            # Store current Player, so that the next new Question will be for the right player
+            Gme.storeI()
             Gme.nextPlayer()
+            # Next Player to answer and Update Text in Question Window
             self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
     def answeredB(self):
@@ -118,8 +121,10 @@ class QuestionWindow(Screen):
         if p.answerQ(q=Gme.getCurrentQuestion(), a="B"):
             self.getNewQuestionWindow()
         else:
-            # Next Player to answer and Update Text in Question Window
+            # Store current Player, so that the next new Question will be for the right player
+            Gme.storeI()
             Gme.nextPlayer()
+            # Next Player to answer and Update Text in Question Window
             self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
     def answeredC(self):
@@ -127,8 +132,10 @@ class QuestionWindow(Screen):
         if p.answerQ(q=Gme.getCurrentQuestion(), a="C"):
             self.getNewQuestionWindow()
         else:
-            # Next Player to answer and Update Text in Question Window
+            # Store current Player, so that the next new Question will be for the right player
+            Gme.storeI()
             Gme.nextPlayer()
+            # Next Player to answer and Update Text in Question Window
             self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
     def answeredD(self):
@@ -136,8 +143,10 @@ class QuestionWindow(Screen):
         if p.answerQ(q=Gme.getCurrentQuestion(), a="D"):
             self.getNewQuestionWindow()
         else:
-            # Next Player to answer and Update Text in Question Window
+            # Store current Player, so that the next new Question will be for the right player
+            Gme.storeI()
             Gme.nextPlayer()
+            # Next Player to answer and Update Text in Question Window
             self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
 
