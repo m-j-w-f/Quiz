@@ -4,6 +4,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty, StringProperty
 from Model.player import Game, Player
 
+# Initialize Game
 Gme = Game(0)
 
 
@@ -12,8 +13,11 @@ class WelcomeWindow(Screen):
     numberR = ObjectProperty(None)
 
     def startGame(self):
+        """
+        Start Game one Button press
+        """
         Gme.setMaxRounds(int(self.numberR.text))
-        # Next Window
+        # Next Window: Player Creation Window
         sm.current = "playerW"
 
 
@@ -21,6 +25,9 @@ class PlayerWindow(Screen):
     inpP = ObjectProperty(None)
 
     def createPlayer(self):
+        """
+        Function that creates a Player on Buttonpress
+        """
         if len(self.inpP.text) > 0:
             p = Player(name=self.inpP.text, gme=Gme)
             print("Player:", p, "created")
@@ -29,6 +36,9 @@ class PlayerWindow(Screen):
             print("Name must have length > 0!")
 
     def startGame(self):
+        """
+        Starts Game
+        """
         if len(self.inpP.text) > 0:
             p = Player(name=self.inpP.text, gme=Gme)
             print("Player:", p, "created")
@@ -47,14 +57,14 @@ class CategoryWindow(Screen):
         self.currentPlayer = Gme.getCurrentPlayer().name + " to select category"
 
     def setCategory(self):
+        """
+        Set Category and Difficulty
+        """
         Gme.setCategory(self.category.text)
-        self.setDifficulty()
+        Gme.setDifficulty(self.difficulty.text)
         # Create Window for new Question and activate it
         sm.add_widget(QuestionWindow())
         sm.current = "questionW"
-
-    def setDifficulty(self):
-        Gme.difficulty = self.difficulty.text
 
 
 class QuestionWindow(Screen):
@@ -79,40 +89,56 @@ class QuestionWindow(Screen):
     def getNewQuestionWindow(self):
         """
         Crates new Question Window with a new Question
-        :return:
         """
+        # Remove old Question
         sm.remove_widget(self)
-        # TODO change Current Player Here
-        # TODO check if new round starts
-        sm.add_widget(QuestionWindow())
-        sm.current = "questionW"
-
+        # Add one to in-Round Counter
+        Gme.nextQinRoundCounter()
+        # check if new round starts
+        if Gme.checkNextRound:
+            Gme.nextRound()
+            sm.current = "categoryW"
+        else:
+            sm.add_widget(QuestionWindow())
+            sm.current = "questionW"
 
     def answeredA(self):
         p = Gme.getCurrentPlayer()
         if p.answerQ(q=Gme.getCurrentQuestion(), a="A"):
             # TODO Add effect for correct/wrong Answer
+            # this adds a new Question Window with a new Question
             self.getNewQuestionWindow()
         else:
-            # TODO add handling for wrong answers
-            pass
+            # Next Player to answer and Update Text in Question Window
+            Gme.nextPlayer()
+            self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
     def answeredB(self):
         p = Gme.getCurrentPlayer()
         if p.answerQ(q=Gme.getCurrentQuestion(), a="B"):
             self.getNewQuestionWindow()
+        else:
+            # Next Player to answer and Update Text in Question Window
+            Gme.nextPlayer()
+            self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
     def answeredC(self):
         p = Gme.getCurrentPlayer()
         if p.answerQ(q=Gme.getCurrentQuestion(), a="C"):
             self.getNewQuestionWindow()
+        else:
+            # Next Player to answer and Update Text in Question Window
+            Gme.nextPlayer()
+            self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
     def answeredD(self):
         p = Gme.getCurrentPlayer()
         if p.answerQ(q=Gme.getCurrentQuestion(), a="D"):
             self.getNewQuestionWindow()
-
-    pass
+        else:
+            # Next Player to answer and Update Text in Question Window
+            Gme.nextPlayer()
+            self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
 
 class GameOverWindow(Screen):
@@ -134,7 +160,3 @@ sm.current = "welcomeW"
 class MainApp(App):
     def build(self):
         return sm
-
-
-if __name__ == "__main__":
-    MainApp().run()

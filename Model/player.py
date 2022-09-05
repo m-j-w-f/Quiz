@@ -6,6 +6,7 @@ class Game:
     players = list()
     currentRound = 0
     i = 0
+    j = 0
 
     def __init__(self, nRnds: int):
         self.numberOfRounds = nRnds
@@ -19,8 +20,21 @@ class Game:
         self.numberOfRounds = nRnds
 
     def nextRound(self):
+        print("Players Shuffled")
         self.currentRound += 1
+        self.i = 0
         shuffle(self.players)
+
+    def nextQinRoundCounter(self):
+        self.j += 1
+        print(self.j)
+
+    def checkNextRound(self):
+        if self.j > len(self.players):
+            self.j = 0
+            print("New Round Started!")
+            return True
+        return False
 
     def getCurrentPlayer(self):
         """
@@ -31,7 +45,6 @@ class Game:
     def nextPlayer(self):
         """
         called by Player if Question is answered correctly
-        :return:
         """
         self.i += 1
         if self.i >= len(self.players):
@@ -46,6 +59,10 @@ class Game:
     def setCategory(self, cat: str):
         self.category = self.categories.get(cat)
         print(self.category)
+
+    def setDifficulty(self, diff: str):
+        self.difficulty = diff
+        print(self.difficulty)
 
     def getNewQuestion(self, cat: int, diff: str):
         self.question = Question(diff=diff, cat=cat, token=self.token)
@@ -75,8 +92,8 @@ class Player:
 
         answer_to_idx = {"A": 0, "B": 1, "C": 2, "D": 3}
         a = answer_to_idx.get(a)
-        print(a)
-        print(q.correct_index)
+        #print(a)
+        #print(q.correct_index)
         if a == q.correct_index:
             print("Correct!")
             self.score += 1
@@ -86,4 +103,4 @@ class Player:
         return False
 
     def __str__(self):
-        return self.name + ":" + str(self.score)
+        return self.name + " : " + str(self.score)
