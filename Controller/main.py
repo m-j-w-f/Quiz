@@ -1,6 +1,7 @@
 from Model.player import Player
 from Model.questions import Question
 from random import shuffle
+from View import ui
 
 
 def main():
@@ -40,7 +41,7 @@ def main():
         shuffle(players)
 
     # Print Results
-    players.sort(key=lambda p: p.score, reverse=True)
+    players.sort(key=lambda player: player.score, reverse=True)
     print("Scoreboard:")
     for x in players:
         print(x)

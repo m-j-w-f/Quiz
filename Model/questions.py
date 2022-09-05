@@ -16,6 +16,12 @@ class Question:
         response = openURL(url)
         return response["token"]
 
+    @staticmethod
+    def getCategories():
+        url = "https://opentdb.com/api_category.php"
+        response = openURL(url)
+        return {x["name"]: x["id"] for x in response["trivia_categories"]}
+
     def __init__(self, diff: str, cat: int, token: str):
         """
         Function to get Questions from the db and initialize Question
