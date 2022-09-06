@@ -39,8 +39,6 @@
             on_release:
                 root.createPlayer()
 
-
-
         Button:
             text: "Start Game"
             on_release:
@@ -80,13 +78,24 @@
     name: "questionW"
     questionL: questionL
 
-
     GridLayout:
         cols:1
 
-        Label:
-            id: questionL
-            text: root.questionText
+        BoxLayout:
+            orientation: 'horizontal'
+
+            Label:
+                id: questionL
+                text: root.questionText
+
+            Button:
+                id: changeL
+                size_hint_y: None
+                size_hint_x: None
+                pos_hint: {'top': 1}
+                size: self.texture_size
+                text: "Sprache ändern"
+                on_release: root.changeLang()
 
         GridLayout:
             cols:2
@@ -97,32 +106,46 @@
                 background_color: (1,0,0,1)
                 background_normal: ""
                 background_down:"darkgrey.jpg"
-                on_release: root.answeredA()
+                on_release: root.answered(answer="A")
+
             Button:
                 id: answerB
                 text:   root.answerB
                 background_color: (255/255, 158/255, 23/255,1)
                 background_normal: ""
                 background_down:"darkgrey.jpg"
-                on_release: root.answeredB()
+                on_release: root.answered(answer="B")
+
             Button:
                 id: answerC
                 text:   root.answerC
                 background_color: (0/255, 148/255, 69/255,1)
                 background_normal: ""
                 background_down:"darkgrey.jpg"
-                on_release: root.answeredC()
+                on_release: root.answered(answer="C")
+
             Button:
                 id: answerD
                 text:   root.answerD
                 background_color: (0/255, 25/255, 148/255,1)
                 background_normal: ""
                 background_down:"darkgrey.jpg"
-                on_release: root.answeredD()
+                on_release: root.answered(answer="D")
 
 <GameOverWindow>:
     name: "gameOverW"
-    txtW: txtW
-    Label:
-        id: txtW
-        text: "Winner:"
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            id: p1L
+            text: root.p1
+
+        Label:
+            id: p2L
+            text: root.p2
+
+        Label:
+            id: p3L
+            text: root.p3

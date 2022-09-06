@@ -70,6 +70,9 @@ class Game:
         """
         :return: Sorted list of Players
         """
+        while len(self.players) < 3:
+            Player(name="Null", gme=self)
+
         return sorted(self.players, key=lambda p: p.score, reverse=True)
 
     def setCategory(self, cat: str):
@@ -87,6 +90,9 @@ class Game:
 
     def getCurrentQuestion(self):
         return self.question
+
+    def gameOver(self):
+        return self.currentRound >= self.numberOfRounds
 
 
 class Player:

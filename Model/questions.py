@@ -47,6 +47,7 @@ class Question:
         idx = randint(0, len(self.answers))
         self.answers.insert(idx, self.correct_answer)
         self.correct_index = idx
+        self.translated = False
 
     def __str__(self):
         s = self.question + "\n"
@@ -57,8 +58,10 @@ class Question:
         return s
 
     def translateQ(self):
-        temp = [self.question] + self.answers
-        temp = translateT(temp)
-        self.question = temp[0]["text"]
-        temp = temp[1:]
-        self.answers = [x["text"] for x in temp]
+        if not self.translated:
+            temp = [self.question] + self.answers
+            temp = translateT(temp)
+            self.question = temp[0]["text"]
+            temp = temp[1:]
+            self.answers = [x["text"] for x in temp]
+            self.translated = True

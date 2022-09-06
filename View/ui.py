@@ -9,7 +9,6 @@ Gme = Game(0)
 
 
 class WelcomeWindow(Screen):
-    numberP = ObjectProperty(None)
     numberR = ObjectProperty(None)
 
     def startGame(self):
@@ -54,7 +53,14 @@ class CategoryWindow(Screen):
 
     def __init__(self, **kwargs):
         super(CategoryWindow, self).__init__(**kwargs)
-        self.currentPlayer = Gme.getCurrentPlayer().name + " to select category"
+        if Gme.gameOver():
+            print("Game Over")
+            # TODO hier Fehler "No Screen with name "gameOverW""??????????
+            sm.add_widget(GameOverWindow())
+            sm.current = "gameOverW"
+        else:
+            Gme.nextRound()
+            self.currentPlayer = Gme.getCurrentPlayer().name + " to select category"
 
     def setCategory(self):
         """
@@ -68,7 +74,6 @@ class CategoryWindow(Screen):
 
 
 class QuestionWindow(Screen):
-    # TODO add round based answering
     questionText = StringProperty()
     answerA = StringProperty()
     answerB = StringProperty()
@@ -79,7 +84,7 @@ class QuestionWindow(Screen):
         super(QuestionWindow, self).__init__(**kwargs)
         # Set Text for Question
         self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + \
-                            Gme.getNewQuestion(cat=Gme.category, diff=Gme.difficulty).question
+            Gme.getNewQuestion(cat=Gme.category, diff=Gme.difficulty).question
         # Set answers
         self.answerA = Gme.question.answers[0]
         self.answerB = Gme.question.answers[1]
@@ -96,16 +101,16 @@ class QuestionWindow(Screen):
         Gme.nextQinRoundCounter()
         # check if new round starts
         if Gme.checkNextRound():
-            Gme.nextRound()
-            # TODO create new category window with correct name or change name
             sm.current = "categoryW"
+            sm.remove_widget(self)
+            sm.add_widget(CategoryWindow())
         else:
             sm.add_widget(QuestionWindow())
             sm.current = "questionW"
 
-    def answeredA(self):
+    def answered(self, answer: str):
         p = Gme.getCurrentPlayer()
-        if p.answerQ(q=Gme.getCurrentQuestion(), a="A"):
+        if p.answerQ(q=Gme.getCurrentQuestion(), a=answer):
             # TODO Add effect for correct/wrong Answer
             # this adds a new Question Window with a new Question
             self.getNewQuestionWindow()
@@ -116,43 +121,26 @@ class QuestionWindow(Screen):
             # Next Player to answer and Update Text in Question Window
             self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
 
-    def answeredB(self):
-        p = Gme.getCurrentPlayer()
-        if p.answerQ(q=Gme.getCurrentQuestion(), a="B"):
-            self.getNewQuestionWindow()
-        else:
-            # Store current Player, so that the next new Question will be for the right player
-            Gme.storeI()
-            Gme.nextPlayer()
-            # Next Player to answer and Update Text in Question Window
-            self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
-
-    def answeredC(self):
-        p = Gme.getCurrentPlayer()
-        if p.answerQ(q=Gme.getCurrentQuestion(), a="C"):
-            self.getNewQuestionWindow()
-        else:
-            # Store current Player, so that the next new Question will be for the right player
-            Gme.storeI()
-            Gme.nextPlayer()
-            # Next Player to answer and Update Text in Question Window
-            self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
-
-    def answeredD(self):
-        p = Gme.getCurrentPlayer()
-        if p.answerQ(q=Gme.getCurrentQuestion(), a="D"):
-            self.getNewQuestionWindow()
-        else:
-            # Store current Player, so that the next new Question will be for the right player
-            Gme.storeI()
-            Gme.nextPlayer()
-            # Next Player to answer and Update Text in Question Window
-            self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.getCurrentQuestion().question
+    def changeLang(self):
+        Gme.question.translateQ()
+        self.questionText = Gme.getCurrentPlayer().name + " to answer:\n" + Gme.question.question
+        # Set answers
+        self.answerA = Gme.question.answers[0]
+        self.answerB = Gme.question.answers[1]
+        self.answerC = Gme.question.answers[2]
+        self.answerD = Gme.question.answers[3]
 
 
 class GameOverWindow(Screen):
-    # TODO add scoreboard
-    pass
+    p1 = StringProperty()
+    p2 = StringProperty()
+    p3 = StringProperty()
+
+    def __init__(self, **kwargs):
+        super(GameOverWindow, self).__init__(**kwargs)
+        self.p1 = f"Winner: {Gme.getScoreboard()[0]}"
+        self.p2 = f"2nd: {Gme.getScoreboard()[1]}"
+        self.p3 = f"3rd: {Gme.getScoreboard()[2]}"
 
 
 # Read .kv file
@@ -164,6 +152,8 @@ for screen in screens:
     sm.add_widget(screen)
 # Set Starting Screen
 sm.current = "welcomeW"
+
+
 
 
 class MainApp(App):
