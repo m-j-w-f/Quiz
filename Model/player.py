@@ -118,7 +118,12 @@ class Player:
         #print(q.correct_index)
         if a == q.correct_index:
             print("Correct!")
-            self.score += 1
+            if self.game.difficulty == "hard":
+                self.score += 3
+            elif self.game.difficulty == "medium":
+                self.score += 2
+            else:
+                self.score += 1
             # restores the correct order of players
             self.game.restoreI()
             self.game.nextPlayer()
